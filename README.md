@@ -7,8 +7,29 @@ This is a bank management system project written in C++.
    ```bash
    git clone https://github.com/vickvey/bms_cpp.git
    ```
+
 2. Go to the project root:
    ```bash
    cd bms_cpp/
    ```
-3. 
+
+3. Create and activate a new python virtual environment:
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+
+4. Install the necessary python dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+5. Give necessary permissions to `run.sh`:
+    ```bash
+    chmod +x run.sh
+    ```
+
+6. Run the script `run.sh` finally:
+    ```bash
+    ./run.sh
+    ```
