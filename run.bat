@@ -2,52 +2,48 @@
 setlocal
 
 REM Exit immediately if a command exits with a non-zero status
-set "ERRLEVEL=0"
+set "ERRORLEVEL=0"
 
-REM Function to check if a command exists
-where /Q "%1"
-if %ERRORLEVEL% NEQ 0 exit /b 1
+REM Check if the 'conan' and 'cmake' commands are available
+where conan >nul 2>&1 || (echo Error: 'conan' command not found. & exit /b 1)
+where cmake >nul 2>&1 || (echo Error: 'cmake' command not found. & exit /b 1)
 
-REM Check if we're in the correct directory
-if not "%~nx0"=="bms_cpp" (
-    echo Error: This script must be run from the cpp_bms directory.
-    exit /b 1
+REM Remove the existing build directory if it exists
+if exist "build" (
+    echo Removing existing build directory...
+    rmdir /s /q "build"
 )
 
-REM Check if conan is installed
-where conan >nul 2>&1 || (
-    echo Error: Conan is not installed. Please install Conan and try again.
-    exit /b 1
-)
-
-REM Check if cmake is installed
-where cmake >nul 2>&1 || (
-    echo Error: CMake is not installed. Please install CMake and try again.
-    exit /b 1
-)
-
-REM Create build directory if it doesn't exist
-if not exist build mkdir build
+REM Create a fresh build directory
+mkdir "build\Release"
 
 REM Install dependencies using Conan
-conan install . --output-folder=build --build=missing
+echo Installing dependencies using Conan...
+conan install . -g CMakeDeps -g CMakeToolchain --build=missing -v || (echo Conan install failed & exit /b 1)
 
-REM Navigate to build directory
-cd build
+REM Ensure the Conan toolchain file was generated correctly
+set "TOOLCHAIN_PATH=build\Release\generators\conan_toolchain.cmake"
+if not exist "%TOOLCHAIN_PATH%" (
+    echo Error: Conan toolchain file 'conan_toolchain.cmake' not found in build\Release\generators directory.
+    exit /b 1
+)
 
 REM Configure the project with CMake
-cmake -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release ..
+echo Configuring the project with CMake...
+cd build
+cmake -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAIN_PATH%" -DCMAKE_BUILD_TYPE=Release .. || (echo CMake configuration failed & exit /b 1)
 
 REM Build the project
-cmake --build . --config Release
+echo Building the project...
+cmake --build . || (echo Build failed & exit /b 1)
 
 REM Run the executable
-cpp_bms.exe
+echo Running the executable...
+bms_cpp.exe || (echo Execution failed & exit /b 1)
 
 REM Return to the project root
 cd ..
 
-echo [Build completed successfully]
-echo [Run completed successfully]
+echo [Build and run completed successfully]
 
 endlocal
