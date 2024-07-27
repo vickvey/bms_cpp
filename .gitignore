@@ -5,4 +5,5 @@ build/
 .venv/
 
 # others
+.vscode/
 CMakeUserPresets.json
