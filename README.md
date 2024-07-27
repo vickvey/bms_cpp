@@ -28,8 +28,12 @@ This is a bank management system project written in C++.
     ```bash
     chmod +x run.sh
     ```
+6. Create a new conan profile with default settings:
+   ```bash
+   conan profile detect
+   ```
 
-6. Run the script `run.sh` finally:
+8. Run the script `run.sh` finally:
     ```bash
     ./run.sh
     ```
