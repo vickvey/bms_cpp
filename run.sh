@@ -9,7 +9,7 @@ command_exists() {
 }
 
 # Check if we're in the correct directory
-if [[ ${PWD:t} != "cpp_bms" ]]; then
+if [[ ${PWD:t} != "bms_cpp" ]]; then
     echo "Error: This script must be run from the cpp_bms directory."
     exit 1
 fi
